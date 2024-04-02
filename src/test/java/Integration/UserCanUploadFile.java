@@ -18,7 +18,7 @@ public class UserCanUploadFile {
     public void userCanUploadFile() throws JsonProcessingException {
         String email = "rashevc88495f@gmail.com";
         String password = "Gazmanov1234";
-        File filePath = new File("src/test/java/Integration/Photo/1583662555_17.jpg");
+        File filePath = new File("src/test/java/Integration/Photo/Man-PNG-Photo.png");
         authApi = new AuthApi();
         String token= authApi.login(email,password,200);
         getUser = new GetUser(token);
@@ -26,7 +26,7 @@ public class UserCanUploadFile {
         JsonPath object = new JsonPath(userJson);
         String userId = object.getString("id");
         uploadPhoto = new UploadPhoto(token);
-        uploadPhoto.uploadImage(filePath,200);
+        uploadPhoto.uploadImage(filePath,201);
 
     }
 }

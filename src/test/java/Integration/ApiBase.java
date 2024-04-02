@@ -104,7 +104,7 @@ public class ApiBase {
     public Response uploadImageRequest(String endpoint, File imageFile, int code) {
         Response response = RestAssured.given()
                 .spec(spec)
-                .contentType("multipart/form-data;")
+                .contentType("multipart/form-data")
                 .multiPart("multipartFile", imageFile)
                 .when()
                 .post(endpoint)
