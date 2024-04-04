@@ -1,12 +1,14 @@
-package Integration.AuthApi;
+package Integration.authApi;
 
 import Integration.ApiBase;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import java.util.LinkedHashMap;
 
 public class AuthApi extends ApiBase {
     Response response;
+    @Step("Registration user")
     public String registration(String email, String password, String confirmPassword, String role, int expectedStatusCode) {
         String endPoint = "/api/auth/register";
         LinkedHashMap<String, String> body = new LinkedHashMap<>();
@@ -25,7 +27,7 @@ public class AuthApi extends ApiBase {
             return "Failed to register user: " + errorMessage;
         }
     }
-
+    @Step("Login by Email and Password : {email},{password}")
     public String login(String email, String password, int expectedStatusCode) {
         String endPoint = "/api/auth/login";
         LinkedHashMap<String, String> body = new LinkedHashMap<>();

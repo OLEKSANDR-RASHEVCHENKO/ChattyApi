@@ -1,10 +1,7 @@
-package Integration.UploadPhoto;
+package Integration.uploadPhoto;
 
 import Integration.ApiBase;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 
 import java.io.File;
 

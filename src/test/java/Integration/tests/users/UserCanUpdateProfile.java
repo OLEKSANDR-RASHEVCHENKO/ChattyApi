@@ -1,60 +1,76 @@
-package Integration;
+package Integration.tests.users;
 
-import Integration.AuthApi.AuthApi;
-import Integration.UpdateUser.UpdateUser;
-import Integration.getUser.GetUser;
+import Integration.authApi.AuthApi;
+import Integration.uploadPhoto.UploadPhoto;
+import Integration.user.UpdateUser;
+import Integration.user.GetUser;
 import Integration.schemas.UserUpdateReq;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.javafaker.Faker;
+import io.qameta.allure.*;
 import io.restassured.path.json.JsonPath;
 import org.testng.annotations.Test;
 
+import java.io.File;
+
 import static org.testng.AssertJUnit.assertEquals;
 
-public class UserCanUpdateProfil {
+public class UserCanUpdateProfile {
 
 
     AuthApi authApi;
     GetUser getUser;
     UpdateUser updateUser;
+    UploadPhoto uploadPhoto;
+    Faker faker = new Faker();
 
-    @Test
+    @Epic(value = "User can update Profile")
+    @Feature(value= "Profile updating")
+    @Story(value = "User can update profile with role user")
+    @Description(value = "User can update profile")
+    @Severity(SeverityLevel.MINOR)
+    @Test(description = "User can update profile")
     public void userCanUpdateProfile() throws JsonProcessingException {
         String email = "rashevc88495f@gmail.com";
         String password = "Gazmanov1234";
-        String newName = "Alex";
-        String newSurname = "Rashevchenko";
-        String newBirthDate = ""; // Предполагается, что пустая строка допустима для birthDate
-        String newPhone = "+123456789";
-        String newGender = "FEMALE";
-        String newAvatarUrl = "http://example.com/new-avatar.jpg";
-        String newBackgroundUrl = "http://example.com/new-background.jpg";
+        String newName = faker.name().firstName();
+        String newSurname = faker.name().lastName();
+        String newBirthDate = "";
+        String newPhone = "+"+faker.phoneNumber().subscriberNumber(10);
+        String newGender = "MALE";
+        File filePathToPhoto = new File("src/test/java/Integration/Photo/Man-PNG-Photo.png");
         boolean newBlockedStatus = false;
+
         authApi = new AuthApi();
         String token = authApi.login(email, password, 200);
+
         getUser = new GetUser(token);
-        String userJson = getUser.getUser();
+        String userJson = getUser.getUser(200);
         JsonPath object = new JsonPath(userJson);
         String userId = object.getString("id");
-        System.out.println(userId);
+
+        uploadPhoto = new UploadPhoto(token);
+        String imageId = uploadPhoto.uploadImage(filePathToPhoto,201);
+
         UserUpdateReq userUpdateReq = new UserUpdateReq();
         userUpdateReq.setName(newName);
         userUpdateReq.setSurname(newSurname);
         userUpdateReq.setBirthDate(newBirthDate);
         userUpdateReq.setPhone(newPhone);
         userUpdateReq.setGender(newGender);
-        userUpdateReq.setAvatarUrl(newAvatarUrl);
-        userUpdateReq.setBackgroundUrl(newBackgroundUrl);
+        userUpdateReq.setAvatarUrl(imageId);
         userUpdateReq.setBlocked(newBlockedStatus);
 
         updateUser = new UpdateUser(token);
         updateUser.updateUser(userId, userUpdateReq, 200);
-        String updatedUserJson = getUser.getUser();
+        String updatedUserJson = getUser.getUser(200);
         JsonPath updatedUser = new JsonPath(updatedUserJson);
+
         assertEquals(updatedUser.getString("name"), newName);
         assertEquals(updatedUser.getString("surname"), newSurname);
         assertEquals(updatedUser.getString("phone"), newPhone);
         assertEquals(updatedUser.getString("gender"), newGender);
-        assertEquals(updatedUser.getString("avatarUrl"), newAvatarUrl);
+        assertEquals(updatedUser.getString("avatarUrl"), imageId);
 
     }
 }

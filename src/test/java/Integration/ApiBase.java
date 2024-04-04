@@ -1,6 +1,6 @@
 package Integration;
 
-import config.Config;
+import Integration.config.Config;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -26,6 +26,20 @@ public class ApiBase {
                 .setContentType(ContentType.JSON)
                 .addHeader("Authorization", "Bearer " + token) // Используем токен в заголовке Authorization
                 .build();
+    }
+    public Response getAllPosts(int skip, int limit, int expectedStatusCode, String endpoint) {
+        Response response = RestAssured.given()
+                .spec(spec)
+                .queryParam("skip", skip)
+                .queryParam("limit", limit)
+                .when()
+                .log().all()
+                .get(endpoint)
+                .then().log().all()
+                .statusCode(expectedStatusCode)
+                .extract()
+                .response();
+        return response;
     }
 
 
@@ -89,11 +103,10 @@ public class ApiBase {
         response.then().assertThat().statusCode(code);
         return response;
     }
-    protected Response deleteRequest(String endpoint,int code,String id){
+    protected Response deleteRequest(String endpoint,int code){
         Response response = RestAssured.given()
                 .spec(spec)
                 .when()
-                .pathParam("id",id)
                 .log().all()
                 .delete(endpoint)
                 .then().log().all()
@@ -105,7 +118,7 @@ public class ApiBase {
         Response response = RestAssured.given()
                 .spec(spec)
                 .contentType("multipart/form-data")
-                .multiPart("multipartFile", imageFile)
+                .multiPart("multipartFile", imageFile,"image/png")
                 .when()
                 .post(endpoint)
                 .then().log().all()
